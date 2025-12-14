@@ -66,7 +66,7 @@ qemu-system-arm \
   -nographic
 ```
 
-> ![NOTE] Limitations
+> [!NOTE] Limitations
 > UART peripheral emulation for Cortex-M targets in QEMU is limited and
 > board-specific. While firmware UART TX logic executes correctly, reliable
 > end-to-end serial forwarding to the host is not guaranteed under emulation.
