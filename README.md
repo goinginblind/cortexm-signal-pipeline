@@ -30,6 +30,37 @@ The firmware implements:
 This architecture mirrors real embedded data acquisition systems
 (e.g. ECG / EEG frontends).
 
+### Protocol Data Unit (PDU)
+
+The protocol uses a fixed-size 72-byte frame structure. Multi-byte integers are transmitted in **Little-Endian** byte order (LSB first).
+
+```text
+  Offset:  0      2      4                   8                                   72
+           +------+------+-------------------+------------------------------------+
+  Field:   | MAGIC| COUNT|    SEQUENCE ID    |         PAYLOAD (SAMPLES)          |
+           +------+------+-------------------+------------------------------------+
+  Type:    | u16  | u16  |       u32         |          uint16_t [32]             |
+           +------+------+-------------------+------------------------------------+
+  Value:   |0xABCD|  32  |   Frame Counter   |      ADC Data (64 bytes total)     |
+           +------+------+-------------------+------------------------------------+
+```
+
+### Wire Representation (Example)
+
+Since the pipeline is Little-Endian, `0xABCD` is transmitted as `CD AB`.
+
+**Example Frame:**
+- Magic: `0xABCD`
+- Count: `32` samples (`0x0020`)
+- Seq:   `1` (`0x00000001`)
+
+```text
+ Byte Stream:
+ [ 0xCD 0xAB ]  [ 0x20 0x00 ]  [ 0x01 0x00 0x00 0x00 ]  [ 0xFF 0x0F ... ]
+ ^-- Magic LSB  ^-- Count LSB  ^-- Seq LSB (Byte 0)     ^-- Sample[0] LSB
+     ^-- Magic MSB   ^-- Count MSB       ^-- Seq MSB (Byte 3)
+```
+
 ---
 
 ## Building the Firmware
